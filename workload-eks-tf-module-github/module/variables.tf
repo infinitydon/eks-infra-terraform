@@ -37,11 +37,6 @@ variable "node_instance_type" {
   default     = "t3.medium"
 }
 
-variable "node_key_name" {
-  description = "The key pair name for the EKS nodes"
-  type        = string
-}
-
 variable "aws_load_balancer_controller_enable" {
   description = "Enable or disable AWS LB controller"
   type = bool

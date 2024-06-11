@@ -16,7 +16,7 @@ module "eks" {
       max_size     = var.node_instance_max_capacity
       desired_size = var.node_instance_desired_capacity
 
-      launch_template_name   = "${var.eks_cluster_name}-selfmanaged-tmpl"
+      launch_template_name   = "${var.eks_cluster_name}-managed-tmpl"
       instance_types          = [var.node_instance_type]
       post_bootstrap_user_data = <<-EOT
         #!/bin/bash

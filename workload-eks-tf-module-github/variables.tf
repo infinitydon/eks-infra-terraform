@@ -7,13 +7,11 @@ variable "region" {
 variable "eks_cluster_name" {
   description = "The name of the EKS cluster"
   type        = string
-  default     = "my-eks-cluster"
 }
 
 variable "eks_cluster_version" {
   description = "The version of the EKS cluster"
   type        = string
-  default     = "1.25"
 }
 
 variable "vpc_id" {
@@ -34,7 +32,6 @@ variable "ng_subnets" {
 variable "node_instance_type" {
   description = "The instance type for the EKS nodes"
   type        = string
-  default     = "t3.medium"
 }
 
 variable "aws_load_balancer_controller_enable" {
@@ -74,4 +71,19 @@ variable "flux2_sync_chart_version" {
 
 variable "flux_tf_controller_chart_version" {
   default = "0.16.0-rc.4"
+}
+
+variable "multus_subnets" {
+  description = "Subnets To Use In Creating Secondary ENIs"
+  type        = string
+}
+
+variable "multus_security_group_id" {
+  description = "The security group ID for the Multus interfaces"
+  type        = string
+}
+
+variable "attach_2nd_eni_lambda_s3_bucket" {
+  description = "Specify S3 Bucket(directory) where you locate Lambda function (Attach2ndENI function)"
+  type        = string
 }

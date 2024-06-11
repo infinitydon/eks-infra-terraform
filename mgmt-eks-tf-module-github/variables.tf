@@ -7,13 +7,11 @@ variable "region" {
 variable "eks_cluster_name" {
   description = "The name of the EKS cluster"
   type        = string
-  default     = "my-eks-cluster"
 }
 
 variable "eks_cluster_version" {
   description = "The version of the EKS cluster"
   type        = string
-  default     = "1.25"
 }
 
 variable "vpc_id" {
@@ -34,7 +32,6 @@ variable "ng_subnets" {
 variable "node_instance_type" {
   description = "The instance type for the EKS nodes"
   type        = string
-  default     = "t3.medium"
 }
 
 variable "aws_load_balancer_controller_enable" {
