@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+
+
 resource "aws_iam_role" "eks_admin_role" {
   name = "${var.eks_cluster_name}-eks-admin-role"
 
@@ -7,7 +10,7 @@ resource "aws_iam_role" "eks_admin_role" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "eks.amazonaws.com"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         Action = "sts:AssumeRole"
       }
@@ -15,14 +18,20 @@ resource "aws_iam_role" "eks_admin_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "eks_admin_policy" {
-  role       = aws_iam_role.eks_admin_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-}
+module "ebs_csi_driver_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.29"
 
-resource "aws_iam_role_policy_attachment" "eks_admin_service_policy" {
-  role       = aws_iam_role.eks_admin_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driver"
+
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
 }
 
 module "eks" {
@@ -93,22 +102,6 @@ module "eks" {
         Terraform   = "true"
       }
    }
-  }
-}
-
-module "ebs_csi_driver_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.29"
-
-  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driver"
-
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
   }
 }
 
