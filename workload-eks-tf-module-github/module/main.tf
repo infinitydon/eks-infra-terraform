@@ -107,21 +107,16 @@ module "eks_blueprints_addons" {
   }
 }
 
-resource "tls_private_key" "github_ssh_key" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P256"
+data "aws_secretsmanager_secret" "github_credentials" {
+  name = "${var.github_repository}-github-credentials"  # Name of the secret to retrieve
 }
 
-resource "aws_secretsmanager_secret" "github_credentials" {
-  name_prefix = "${var.eks_cluster_name}"
+data "aws_secretsmanager_secret_version" "github_credentials_version" {
+  secret_id = data.aws_secretsmanager_secret.github_credentials.id
 }
 
-resource "aws_secretsmanager_secret_version" "github_credentials_version" {
-  secret_id = aws_secretsmanager_secret.github_credentials.id
-  secret_string = jsonencode({
-    private_key = tls_private_key.github_ssh_key.private_key_pem
-    public_key  = tls_private_key.github_ssh_key.public_key_openssh
-  })
+locals {
+  secret_data = jsondecode(data.aws_secretsmanager_secret_version.github_credentials_version.secret_string)
 }
 
 
@@ -140,26 +135,12 @@ resource "kubernetes_secret" "ssh_keypair" {
   type = "Opaque"
 
   data = {
-    "identity.pub" =  tls_private_key.github_ssh_key.public_key_openssh
-    "identity"     = tls_private_key.github_ssh_key.private_key_pem
+    "identity.pub" =  local.secret_data.public_key
+    "identity"     = local.secret_data.private_key
     "known_hosts"  = "github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg="
   }
 
   depends_on = [kubernetes_namespace.flux_system]
-}
-
-resource "github_repository" "gitops" {
-  name        = var.github_repository
-  description = var.github_repository
-  visibility  = "public"
-  auto_init   = true
-}
-
-resource "github_repository_deploy_key" "gitops" {
-  title      = "Flux"
-  repository = github_repository.gitops.name
-  key        = tls_private_key.github_ssh_key.public_key_openssh
-  read_only  = "false"
 }
 
 resource "helm_release" "flux2" {
@@ -186,7 +167,7 @@ resource "helm_release" "flux2_sync" {
 
   set {
     name  = "gitRepository.spec.url"
-    value = github_repository.gitops.http_clone_url
+    value = "https://github.com/${var.github_org}/${var.github_repository}.git"
   }
 
   set {
@@ -211,12 +192,4 @@ output "eks_kubeconfig" {
   value = <<-EOT
     aws eks update-kubeconfig --name ${var.eks_cluster_name} --region ${var.region}
   EOT
-}
-
-output "github_repo_url" {
-  value = github_repository.gitops.http_clone_url
-}
-
-output "github_credentials_secret_arn" {
-  value = aws_secretsmanager_secret.github_credentials.arn
 }

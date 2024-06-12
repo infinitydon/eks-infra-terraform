@@ -44,8 +44,8 @@ variable "github_repository" {
   type = string
 }
 
-variable "github_token" {
-  description = "Github PAT"
+variable "github_org" {
+  description = "Github Org or Username"
   type = string
 }
 

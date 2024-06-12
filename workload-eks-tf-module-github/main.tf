@@ -20,7 +20,7 @@ module "workload_cluster" {
   ng_subnets      = var.ng_subnets
   eks_subnets = var.eks_subnets
   github_repository = var.github_repository
-  github_token   = var.github_token
+  github_org   = var.github_org
   multus_subnets  = var.multus_subnets
   multus_security_group_id  = var.multus_security_group_id
   attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
@@ -32,12 +32,4 @@ module "workload_cluster" {
 
 output "eks_kubeconfig" {
   value = module.workload_cluster.eks_kubeconfig
-}
-
-output "github_repo_url" {
-  value = module.workload_cluster.github_repo_url
-}
-
-output "github_credentials_secret_arn" {
-  value = module.workload_cluster.github_credentials_secret_arn
 }
