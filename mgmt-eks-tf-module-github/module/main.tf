@@ -7,7 +7,22 @@ module "eks" {
   subnet_ids      = var.ng_subnets
   control_plane_subnet_ids = var.eks_subnets
   cluster_endpoint_public_access = true
-  enable_cluster_creator_admin_permissions = true 
+  enable_cluster_creator_admin_permissions = true
+
+  cluster_addons = {
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
+    aws-ebs-csi-driver = {
+      service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
+    }
+  }   
 
   eks_managed_node_groups = {
    NG1= {      
@@ -48,22 +63,7 @@ module "eks_blueprints_addons" {
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
   cluster_version   = module.eks.cluster_version
-  oidc_provider_arn = module.eks.oidc_provider_arn
-
-  eks_addons = {
-    coredns = {
-      most_recent = true
-    }
-    kube-proxy = {
-      most_recent = true
-    }
-    vpc-cni = {
-      most_recent = true
-    }
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
-    }
-  }   
+  oidc_provider_arn = module.eks.oidc_provider_arn  
 
   enable_aws_load_balancer_controller  = var.aws_load_balancer_controller_enable
 
