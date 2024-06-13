@@ -8,7 +8,7 @@ module "vpc_ran" {
   name = "vpc-ran"
   cidr = var.vpc_ran_cidr
 
-  azs             = [var.ran_az1, var.ran_az2, var.ran_az1, var.ran_az1]
+  azs             = [var.ran_az1, var.ran_az2, var.ran_az1, var.ran_az1, var.ran_az1, var.ran_az1]
   private_subnets = [var.ran_eks_private_subnet_1, var.ran_eks_private_subnet_2, var.ran_f1_private_subnet, var.ran_e1_private_subnet, var.ran_n2_private_subnet, var.ran_n3_private_subnet]
   public_subnets  = [var.ran_public_subnet_1, var.ran_public_subnet_2]
 
