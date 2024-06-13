@@ -6,7 +6,7 @@ locals {
     ng_subnets                      = ["${module.vpc_ran.private_subnets[0]}"]
     multus_security_group_id        = aws_security_group.ran_multus_sg.id
     multus_subnets                  = "${module.vpc_ran.private_subnets[2]},${module.vpc_ran.private_subnets[3]},${module.vpc_ran.private_subnets[4]},${module.vpc_ran.private_subnets[5]}"
-    github_credentails_secret_name  = aws_secretsmanager_secret.github_credentials[0].name
+    github_credentails_secret_name  = aws_secretsmanager_secret.github_credentials[var.github_repositories[0]].name
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
     github_repository               = var.github_repositories[0]
@@ -19,7 +19,7 @@ locals {
     ng_subnets                      = ["${module.vpc_core_controlplane.private_subnets[0]}"]
     multus_security_group_id        = aws_security_group.core_controlplane_multus_sg.id
     multus_subnets                  = "${module.vpc_core_controlplane.private_subnets[2]},${module.vpc_core_controlplane.private_subnets[3]}"
-    github_credentails_secret_name  = aws_secretsmanager_secret.github_credentials[1].name
+    github_credentails_secret_name  = aws_secretsmanager_secret.github_credentials[var.github_repositories[1]].name
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
     github_repository               = var.github_repositories[1]
@@ -32,7 +32,7 @@ locals {
     ng_subnets                      = ["${module.vpc_core_userplane.private_subnets[0]}"]
     multus_security_group_id        = aws_security_group.core_controlplane_multus_sg.id
     multus_subnets                  = "${module.vpc_core_userplane.private_subnets[2]},${module.vpc_core_userplane.private_subnets[3]}"
-    github_credentails_secret_name  = aws_secretsmanager_secret.github_credentials[2].name
+    github_credentails_secret_name  = aws_secretsmanager_secret.github_credentials[var.github_repositories[2]].name
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
     github_repository               = var.github_repositories[2]
