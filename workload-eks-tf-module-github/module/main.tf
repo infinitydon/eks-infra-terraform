@@ -146,7 +146,7 @@ module "eks_blueprints_addons" {
 }
 
 data "aws_secretsmanager_secret" "github_credentials" {
-  name = "${var.github_repository}-github-credentials"  # Name of the secret to retrieve
+  name = var.git_credentials_secret
 }
 
 data "aws_secretsmanager_secret_version" "github_credentials_version" {

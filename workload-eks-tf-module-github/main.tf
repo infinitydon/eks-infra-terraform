@@ -11,19 +11,28 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_ssm_parameter" "workload" {
+  name = "/${var.ran_parameter_store_name}/config"
+}
+
+locals {
+  workload_config = jsondecode(data.aws_ssm_parameter.workload.value)
+}
+
 module "workload_cluster" {
   source = "./module"
 
   eks_cluster_name    = var.eks_cluster_name
   eks_cluster_version = var.eks_cluster_version
-  vpc_id          = var.vpc_id
-  ng_subnets      = var.ng_subnets
-  eks_subnets = var.eks_subnets
-  github_repository = var.github_repository
-  github_org   = var.github_org
-  multus_subnets  = var.multus_subnets
-  multus_security_group_id  = var.multus_security_group_id
-  attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
+  vpc_id          = local.workload_config.vpc_id
+  ng_subnets      = local.workload_config.ng_subnets
+  eks_subnets = local.workload_config.eks_subnets
+  github_repository = local.workload_config.github_repository
+  git_credentials_secret = local.workload_config.github_credentails_secret_name
+  github_org   = local.workload_config.github_org
+  multus_subnets  = local.workload_config.multus_subnets
+  multus_security_group_id  = local.workload_config.multus_security_group_id
+  attach_2nd_eni_lambda_s3_bucket = local.workload_config.attach_2nd_eni_lambda_s3_bucket
   node_instance_type = var.node_instance_type
   node_instance_min_capacity = var.node_instance_min_capacity
   node_instance_max_capacity = var.node_instance_max_capacity

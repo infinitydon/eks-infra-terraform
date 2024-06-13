@@ -52,6 +52,10 @@ variable "github_org" {
   type = string
 }
 
+variable "git_credentials_secret" {
+  description = "AWS secret manager name that has the github SSH credentials"
+}
+
 variable "node_instance_desired_capacity" {
   default = "1"
 }
