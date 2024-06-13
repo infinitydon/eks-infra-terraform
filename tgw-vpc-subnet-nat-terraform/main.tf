@@ -105,6 +105,12 @@ resource "aws_ec2_subnet_cidr_reservation" "ran_n2" {
   subnet_id        = module.vpc_ran.private_subnets[4]
 }
 
+resource "aws_ec2_subnet_cidr_reservation" "ran_n3" {
+  cidr_block       = var.ran_n3_private_subnet_cidr_reservation
+  reservation_type = "explicit"
+  subnet_id        = module.vpc_ran.private_subnets[5]
+}
+
 resource "aws_ec2_subnet_cidr_reservation" "core_controlplane_core_n2" {
   cidr_block       = var.core_controlplane_core_n2_private_subnet_cidr_reservation
   reservation_type = "explicit"
