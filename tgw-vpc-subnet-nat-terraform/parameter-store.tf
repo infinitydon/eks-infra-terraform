@@ -30,8 +30,8 @@ locals {
     vpc_id                          = module.vpc_core_userplane.vpc_id
     eks_subnets                     = ["${module.vpc_core_userplane.public_subnets[0]}","${module.vpc_core_userplane.public_subnets[1]}","${module.vpc_core_userplane.private_subnets[0]}", "${module.vpc_core_userplane.private_subnets[1]}"]
     ng_subnets                      = ["${module.vpc_core_userplane.private_subnets[0]}"]
-    multus_security_group_id        = aws_security_group.core_controlplane_multus_sg.id
-    multus_subnets                  = "${module.vpc_core_userplane.private_subnets[2]},${module.vpc_core_userplane.private_subnets[3]}"
+    multus_security_group_id        = aws_security_group.core_userplane_multus_sg.id
+    multus_subnets                  = "${module.vpc_core_userplane.private_subnets[2]},${module.vpc_core_userplane.private_subnets[3]},${module.vpc_core_userplane.private_subnets[4]}"
     github_credentails_secret_name  = aws_secretsmanager_secret.github_credentials[var.github_repositories[2]].name
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
