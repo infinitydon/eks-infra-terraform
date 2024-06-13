@@ -49,6 +49,6 @@ variable "flux_tf_controller_chart_version" {
   default = "0.16.0-rc.4"
 }
 
-variable "ran_parameter_store_name" {
+variable "parameter_store_name" {
   description = "Parameter for the workload-cluster, this is where vpc-id, subnets, multus details etc will be picked up"
 }

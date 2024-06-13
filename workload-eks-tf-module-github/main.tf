@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 data "aws_ssm_parameter" "workload" {
-  name = "/${var.ran_parameter_store_name}/config"
+  name = "/${var.parameter_store_name}/config"
 }
 
 locals {
