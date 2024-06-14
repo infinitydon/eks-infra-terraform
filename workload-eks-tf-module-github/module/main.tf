@@ -46,6 +46,7 @@ module "eks" {
   cluster_endpoint_private_access = false
   enable_cluster_creator_admin_permissions = true
   create_kms_key                 = false
+  cluster_encryption_config = {}
 
   cluster_addons = {
     coredns = {
