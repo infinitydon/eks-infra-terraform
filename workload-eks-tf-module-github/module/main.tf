@@ -87,7 +87,7 @@ module "eks" {
 
       launch_template_name   = "${var.eks_cluster_name}-managed-tmpl"
       instance_types          = [var.node_instance_type]
-      post_bootstrap_user_data = <<-EOT
+      pre_bootstrap_user_data = <<-EOT
         #!/bin/bash
         set -o xtrace
         echo "net.ipv4.conf.default.rp_filter = 0" | tee -a /etc/sysctl.conf
