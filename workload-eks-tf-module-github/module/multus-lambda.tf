@@ -2,7 +2,7 @@
 ## Ec2Ins LcHook is for ENI Attach Lambda Call
 resource "aws_autoscaling_lifecycle_hook" "LchookEc2InsNg1" {
   name                   = "${var.eks_cluster_name}-nodegroup-LchookEc2InsNg1"
-  autoscaling_group_name = module.eks.eks_managed_node_groups_autoscaling_group_names[0]
+  autoscaling_group_name = module.eks.self_managed_node_groups_autoscaling_group_names[0]
   default_result         = "ABANDON"
   heartbeat_timeout      = 300
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
@@ -10,7 +10,7 @@ resource "aws_autoscaling_lifecycle_hook" "LchookEc2InsNg1" {
 
 resource "aws_autoscaling_lifecycle_hook" "LchookEc2TermNg1" {
   name                   = "${var.eks_cluster_name}-nodegroup-LchookEc2TermNg1"
-  autoscaling_group_name = module.eks.eks_managed_node_groups_autoscaling_group_names[0]
+  autoscaling_group_name = module.eks.self_managed_node_groups_autoscaling_group_names[0]
   default_result         = "CONTINUE"
   heartbeat_timeout      = 300
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
@@ -118,7 +118,7 @@ resource "aws_cloudwatch_event_rule" "NewInstanceEventRule" {
       "EC2 Instance-terminate Lifecycle Action"
     ]
     detail = {
-        AutoScalingGroupName: [module.eks.eks_managed_node_groups_autoscaling_group_names[0]]
+        AutoScalingGroupName: [module.eks.self_managed_node_groups_autoscaling_group_names[0]]
     }
     source = [
         "aws.autoscaling"
@@ -160,7 +160,7 @@ resource "aws_lambda_invocation" "restart_asg_instances" {
   function_name = aws_lambda_function.asg_instances_auto_restart.function_name
 
   input = jsonencode({
-     "AsgName": module.eks.eks_managed_node_groups_autoscaling_group_names[0]
+     "AsgName": module.eks.self_managed_node_groups_autoscaling_group_names[0]
   })
 
   depends_on = [
