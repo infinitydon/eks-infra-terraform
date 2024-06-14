@@ -78,7 +78,7 @@ module "eks" {
     }
   }
 
-  eks_managed_node_groups = {
+  self_managed_node_groups = {
    NG1= {      
       name         = "${var.eks_cluster_name}-nodegroup"
       min_size     = var.node_instance_min_capacity
@@ -87,7 +87,8 @@ module "eks" {
 
       launch_template_name   = "${var.eks_cluster_name}-managed-tmpl"
       instance_types          = [var.node_instance_type]
-      pre_bootstrap_user_data = <<-EOT
+      enable_bootstrap_user_data = true
+      post_bootstrap_user_data = <<-EOT
         #!/bin/bash
         set -o xtrace
         echo "net.ipv4.conf.default.rp_filter = 0" | tee -a /etc/sysctl.conf
