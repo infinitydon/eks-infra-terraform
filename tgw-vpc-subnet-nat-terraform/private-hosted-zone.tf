@@ -4,6 +4,10 @@ resource "aws_route53_zone" "controlplane_internal" {
   vpc {
     vpc_id = module.vpc_core_controlplane.vpc_id
   }
+
+  lifecycle {
+    ignore_changes = [vpc]
+  }  
 }
 
 # Authorize the association of the additional VPC with the private hosted zone
