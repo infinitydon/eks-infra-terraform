@@ -17,5 +17,5 @@ resource "aws_route53_vpc_association_authorization" "userplane_auth" {
 resource "aws_route53_zone_association" "userplane_vpc" {
   zone_id = aws_route53_zone.controlplane_internal.zone_id
   vpc_id  = module.vpc_core_userplane.vpc_id
-  depends_on = [aws_route53_vpc_association_authorization.auth]
+  depends_on = [aws_route53_vpc_association_authorization.userplane_auth]
 }
