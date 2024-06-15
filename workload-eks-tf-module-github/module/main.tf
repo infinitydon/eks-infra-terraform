@@ -149,10 +149,9 @@ resource "kubernetes_service_account" "external-dns" {
         name      = "external-dns"
         namespace = "kube-system"
         annotations = {
-          "eks.amazonaws.com/role-arn" = module.external_dns_irsa.iam_role_arn
+          "eks.amazonaws.com/role-arn" = module.external_dns_irsa[0].iam_role_arn
         }
     }
-    depends_on = [ kubernetes_namespace.namespace ]
 }
 
 module "eks_blueprints_addons" {
