@@ -23,6 +23,8 @@ locals {
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
     github_repository               = var.github_repositories[1]
+    hosted_zone_arn                 = aws_route53_zone.controlplane_internal.arn
+    hosted_zone_id                 = aws_route53_zone.controlplane_internal.id
   }  
 
   user_plane = {

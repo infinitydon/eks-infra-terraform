@@ -144,3 +144,7 @@ output "github_credentials_arns" {
 output "repository_https_urls" {
   value = { for repo in github_repository.gitops : repo.name => repo.html_url }
 }
+
+output "control_plane_hosted_zone_arn" {
+  value = aws_route53_zone.controlplane_internal.arn
+}
