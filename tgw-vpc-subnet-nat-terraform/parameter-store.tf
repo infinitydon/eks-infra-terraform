@@ -10,6 +10,10 @@ locals {
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
     github_repository               = var.github_repositories[0]
+    create_external_dns             = false
+    external_dns_domain_name        = "nil"
+    hosted_zone_arn                 = ""
+    hosted_zone_id                  = ""
   }
 
   control_plane = {
@@ -23,8 +27,10 @@ locals {
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
     github_repository               = var.github_repositories[1]
+    create_external_dns             = true
+    external_dns_domain_name        = "oai.internal"
     hosted_zone_arn                 = aws_route53_zone.controlplane_internal.arn
-    hosted_zone_id                 = aws_route53_zone.controlplane_internal.id
+    hosted_zone_id                  = aws_route53_zone.controlplane_internal.id
   }  
 
   user_plane = {
@@ -38,6 +44,10 @@ locals {
     attach_2nd_eni_lambda_s3_bucket = var.attach_2nd_eni_lambda_s3_bucket
     github_org                      = var.github_org
     github_repository               = var.github_repositories[2]
+    create_external_dns             = false
+    external_dns_domain_name        = "nil"
+    hosted_zone_arn                 = ""
+    hosted_zone_id                  = ""    
   }
 
   ran_json = jsonencode(local.ran)
