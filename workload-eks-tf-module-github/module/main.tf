@@ -143,6 +143,17 @@ module "external_dns_irsa" {
   }
 }
 
+resource "kubernetes_service_account" "external-dns" {
+    metadata {
+        name      = "external-dns"
+        namespace = "kube-system"
+        annotations = {
+          "eks.amazonaws.com/role-arn" = module.external_dns_irsa.iam_role_arn
+        }
+    }
+    depends_on = [ kubernetes_namespace.namespace ]
+}
+
 module "eks_blueprints_addons" {
   source = "aws-ia/eks-blueprints-addons/aws"
   version = "~> 1.0" #ensure to update gitops to the latest/desired version
