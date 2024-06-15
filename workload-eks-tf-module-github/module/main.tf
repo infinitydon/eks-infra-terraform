@@ -126,6 +126,23 @@ module "external_secret_irsa" {
   }
 }
 
+module "external_dns_irsa" {
+  count = var.create_external_dns ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.29"
+
+  role_name_prefix = "${module.eks.cluster_name}-external-dns"
+
+  attach_external_dns_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:external-dns"]
+    }
+  }
+}
+
 module "eks_blueprints_addons" {
   source = "aws-ia/eks-blueprints-addons/aws"
   version = "~> 1.0" #ensure to update gitops to the latest/desired version
@@ -228,6 +245,44 @@ resource "helm_release" "flux2_sync" {
   }
 
   depends_on = [helm_release.flux2]
+}
+
+resource "helm_release" "external_dns" {
+  count = var.create_external_dns ? 1 : 0
+  repository = "https://kubernetes-sigs.github.io/external-dns/"
+  chart      = "external-dns"
+  version    = var.external_dns_chart_version
+
+  # Note: Do not change the name or namespace of gitops resource. The below mimics the behaviour of "flux bootstrap".
+  name      = "external-dns"
+  namespace = "kube-system"
+
+  set {
+    name  = "serviceAccount.create"
+    value = false
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = "external-dns"
+  }
+
+  set {
+    name  = "domainFilters[0]"
+    value = var.external_dns_domain_name
+  }
+
+  set {
+    name  = "logLevel"
+    value = "info"
+  }
+
+  set {
+    name  = "txtOwnerId"
+    value = var.eks_cluster_name
+  }  
+
+  depends_on = [module.external_dns_irsa]
 }
 
 output "eks_kubeconfig" {

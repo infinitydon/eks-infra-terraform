@@ -52,3 +52,7 @@ variable "flux_tf_controller_chart_version" {
 variable "parameter_store_name" {
   description = "Parameter for the workload-cluster, this is where vpc-id, subnets, multus details etc will be picked up"
 }
+
+variable "external_dns_chart_version" {
+  default = "1.14.5"
+}

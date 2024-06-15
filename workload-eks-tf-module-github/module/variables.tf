@@ -114,3 +114,16 @@ variable "flux2_chart_version" {
 variable "flux2_sync_chart_version" {
   default = "1.8.2"
 }
+
+variable "create_external_dns" {
+  description = "Flag to control the creation of the external DNS chart"
+  type        = bool
+}
+
+variable "external_dns_chart_version" {
+  default = "1.14.5"
+}
+
+variable "external_dns_domain_name" {
+  description = "Route53 private hosted zone domain name"
+}

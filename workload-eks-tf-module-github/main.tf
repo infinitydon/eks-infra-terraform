@@ -36,7 +36,10 @@ module "workload_cluster" {
   node_instance_type = var.node_instance_type
   node_instance_min_capacity = var.node_instance_min_capacity
   node_instance_max_capacity = var.node_instance_max_capacity
-  node_instance_desired_capacity = var.node_instance_desired_capacity  
+  node_instance_desired_capacity = var.node_instance_desired_capacity
+  create_external_dns  = local.workload_config.create_external_dns
+  external_dns_chart_version = var.external_dns_chart_version
+  external_dns_domain_name  = local.workload_config.external_dns_domain_name
 }
 
 output "eks_kubeconfig" {
