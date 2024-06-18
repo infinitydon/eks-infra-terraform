@@ -56,3 +56,9 @@ variable "parameter_store_name" {
 variable "external_dns_chart_version" {
   default = "1.14.5"
 }
+
+variable "additional_cidrs_to_allow" {
+  description = "CIDRs to allow in the NodeGroup security"
+  type        = list(string)
+  default = [ "10.0.0.0/8" ]
+}

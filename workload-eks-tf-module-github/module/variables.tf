@@ -133,3 +133,9 @@ variable "vpc_security_group_ids" {
   type        = list(string)
   default     = []
 }
+
+variable "additional_cidrs_to_allow" {
+  description = "CIDRs to allow in the NodeGroup security"
+  type        = list(string)
+  default = []
+}

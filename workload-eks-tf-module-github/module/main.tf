@@ -90,7 +90,7 @@ module "eks" {
       min_size     = var.node_instance_min_capacity
       max_size     = var.node_instance_max_capacity
       desired_size = var.node_instance_desired_capacity
-      vpc_security_group_ids = [var.vpc_security_group_ids]
+      vpc_security_group_ids = var.vpc_security_group_ids
       launch_template_name   = "${var.eks_cluster_name}-managed-tmpl"
       instance_type         = var.node_instance_type
       enable_bootstrap_user_data = true
@@ -111,6 +111,17 @@ module "eks" {
       }
    }
   }
+}
+
+resource "aws_security_group_rule" "allow_additional_cidrs" {
+  count = length(var.additional_cidrs_to_allow) > 0 ? length(var.additional_cidrs_to_allow) : 0
+
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  security_group_id = module.eks.node_security_group_id
+  cidr_blocks       = [element(var.additional_cidrs_to_allow, count.index)]
 }
 
 module "external_secret_irsa" {
