@@ -40,6 +40,8 @@ module "workload_cluster" {
   create_external_dns  = local.workload_config.create_external_dns
   external_dns_chart_version = var.external_dns_chart_version
   external_dns_domain_name  = local.workload_config.external_dns_domain_name
+  vpc_security_group_ids   = local.workload_config.multus_security_group_id
+  
 }
 
 output "eks_kubeconfig" {

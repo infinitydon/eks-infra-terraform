@@ -127,3 +127,9 @@ variable "external_dns_chart_version" {
 variable "external_dns_domain_name" {
   description = "Route53 private hosted zone domain name"
 }
+
+variable "vpc_security_group_ids" {
+  description = "A list of security group IDs to associate"
+  type        = list(string)
+  default     = []
+}

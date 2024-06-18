@@ -57,6 +57,10 @@ module "eks" {
     }
     vpc-cni = {
       most_recent = true
+      configuration_values = jsonencode({
+        AWS_VPC_K8S_CNI_EXTERNALSNAT = true
+        AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS = "10.0.0.0/8"
+      })
     }
     aws-ebs-csi-driver = {
       service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
@@ -86,12 +90,11 @@ module "eks" {
       min_size     = var.node_instance_min_capacity
       max_size     = var.node_instance_max_capacity
       desired_size = var.node_instance_desired_capacity
-
+      vpc_security_group_ids = [var.vpc_security_group_ids]
       launch_template_name   = "${var.eks_cluster_name}-managed-tmpl"
       instance_type         = var.node_instance_type
       enable_bootstrap_user_data = true
       post_bootstrap_user_data = <<-EOT
-        #!/bin/bash
         set -x
         echo "net.ipv4.conf.default.rp_filter = 0" | tee -a /etc/sysctl.conf
         echo "net.ipv4.conf.all.rp_filter = 0" | tee -a /etc/sysctl.conf
