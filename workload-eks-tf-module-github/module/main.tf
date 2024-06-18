@@ -1,5 +1,21 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_ami" "eks_ubuntu" {
+  count = var.use_ubuntu_ami ? 1 : 0
+  most_recent = true
+  owners = ["099720109477"] # Canonical (Ubuntu)
+
+  filter {
+    name   = "name"
+    values = ["ubuntu-eks/k8s_${var.eks_cluster_version}/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+        name = "virtualization-type"
+        values = ["hvm"]
+  }
+}
+
 
 resource "aws_iam_role" "eks_admin_role" {
   name = "${var.eks_cluster_name}-eks-admin-role"
@@ -89,6 +105,7 @@ module "eks" {
   self_managed_node_groups = {
    NG1= {      
       name         = "${var.eks_cluster_name}-nodegroup"
+      ami_id       = var.use_ubuntu_ami ? element(data.aws_ami.eks_ubuntu.*.id, 0) : null
       min_size     = var.node_instance_min_capacity
       max_size     = var.node_instance_max_capacity
       desired_size = var.node_instance_desired_capacity
