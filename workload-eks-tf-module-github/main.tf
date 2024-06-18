@@ -40,7 +40,7 @@ module "workload_cluster" {
   create_external_dns  = local.workload_config.create_external_dns
   external_dns_chart_version = var.external_dns_chart_version
   external_dns_domain_name  = local.workload_config.external_dns_domain_name
-  
+  additional_cidrs_to_allow = var.additional_cidrs_to_allow
 }
 
 output "eks_kubeconfig" {
