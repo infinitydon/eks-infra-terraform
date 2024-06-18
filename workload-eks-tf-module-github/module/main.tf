@@ -58,8 +58,8 @@ module "eks" {
     vpc-cni = {
       most_recent = true
       configuration_values = jsonencode({
-        AWS_VPC_K8S_CNI_EXTERNALSNAT = true
-        AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS = "10.0.0.0/8"
+        AWS_VPC_K8S_CNI_EXTERNALSNAT: true,
+        AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS: "10.0.0.0/8"
       })
     }
     aws-ebs-csi-driver = {
