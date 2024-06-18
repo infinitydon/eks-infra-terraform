@@ -14,6 +14,7 @@ locals {
     external_dns_domain_name        = "nil"
     hosted_zone_arn                 = ""
     hosted_zone_id                  = ""
+    use_ubuntu_ami                  = true
   }
 
   control_plane = {
@@ -31,6 +32,7 @@ locals {
     external_dns_domain_name        = "oai.internal"
     hosted_zone_arn                 = aws_route53_zone.controlplane_internal.arn
     hosted_zone_id                  = aws_route53_zone.controlplane_internal.id
+    use_ubuntu_ami                  = false
   }  
 
   user_plane = {
@@ -47,7 +49,8 @@ locals {
     create_external_dns             = false
     external_dns_domain_name        = "nil"
     hosted_zone_arn                 = ""
-    hosted_zone_id                  = ""    
+    hosted_zone_id                  = ""
+    use_ubuntu_ami                  = false
   }
 
   ran_json = jsonencode(local.ran)
