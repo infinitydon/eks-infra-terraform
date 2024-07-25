@@ -8,7 +8,7 @@ module "vpc_ran" {
   name = "vpc-ran"
   cidr = var.vpc_ran_cidr
 
-  azs             = [var.ran_az1, var.ran_az2, var.ran_az1, var.ran_az1, var.ran_az1, var.ran_az1]
+  azs             = [var.ran_az1, var.ran_az2, var.ran_az1, var.ran_az1]
   private_subnets = [var.ran_eks_private_subnet_1, var.ran_eks_private_subnet_2, var.ran_f1_private_subnet, var.ran_e1_private_subnet, var.ran_n2_private_subnet, var.ran_n3_private_subnet]
   public_subnets  = [var.ran_public_subnet_1, var.ran_public_subnet_2]
 
@@ -20,14 +20,20 @@ module "vpc_ran" {
   enable_dns_support   = true
   single_nat_gateway = true
 
-  public_subnet_tags = {
-    "kubernetes.io/role/elb" = 1
-  }
+}
 
-  private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = 1
-  }  
+resource "aws_ec2_tag" "ran_public_subnet_elb_tag" {
+  count       = length(module.vpc_ran.public_subnet_ids)
+  resource_id = module.vpc_ran.public_subnet_ids[count.index]
+  key         = "kubernetes.io/role/elb"
+  value       = "1"
+}
 
+resource "aws_ec2_tag" "ran_private_subnet_internal_elb_tag" {
+  count       = length(module.vpc_ran.private_subnet_ids)
+  resource_id = module.vpc_ran.private_subnet_ids[count.index]
+  key         = "kubernetes.io/role/internal-elb"
+  value       = "1"
 }
 
 module "vpc_core_controlplane" {
@@ -58,6 +64,20 @@ module "vpc_core_controlplane" {
 
 }
 
+resource "aws_ec2_tag" "core_ctrl_public_subnet_elb_tag" {
+  count       = length(module.vpc_core_controlplane.public_subnet_ids)
+  resource_id = module.vpc_core_controlplane.public_subnet_ids[count.index]
+  key         = "kubernetes.io/role/elb"
+  value       = "1"
+}
+
+resource "aws_ec2_tag" "core_ctrl_private_subnet_internal_elb_tag" {
+  count       = length(module.vpc_core_controlplane.private_subnet_ids)
+  resource_id = module.vpc_core_controlplane.private_subnet_ids[count.index]
+  key         = "kubernetes.io/role/internal-elb"
+  value       = "1"
+}
+
 module "vpc_core_userplane" {
   source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.8.1"
 
@@ -86,6 +106,20 @@ module "vpc_core_userplane" {
 
 }
 
+resource "aws_ec2_tag" "user_plane_public_subnet_elb_tag" {
+  count       = length(module.vpc_core_userplane.public_subnet_ids)
+  resource_id = module.vpc_core_userplane.public_subnet_ids[count.index]
+  key         = "kubernetes.io/role/elb"
+  value       = "1"
+}
+
+resource "aws_ec2_tag" "user_plane_private_subnet_internal_elb_tag" {
+  count       = length(module.vpc_core_userplane.private_subnet_ids)
+  resource_id = module.vpc_core_userplane.private_subnet_ids[count.index]
+  key         = "kubernetes.io/role/internal-elb"
+  value       = "1"
+}
+
 ## CIDR Reservation to dedicate speicific IP blocks for Multus subnets
 resource "aws_ec2_subnet_cidr_reservation" "ran_f1" {
   cidr_block       = var.ran_f1_private_subnet_cidr_reservation
@@ -103,12 +137,6 @@ resource "aws_ec2_subnet_cidr_reservation" "ran_n2" {
   cidr_block       = var.ran_n2_private_subnet_cidr_reservation
   reservation_type = "explicit"
   subnet_id        = module.vpc_ran.private_subnets[4]
-}
-
-resource "aws_ec2_subnet_cidr_reservation" "ran_n3" {
-  cidr_block       = var.ran_n3_private_subnet_cidr_reservation
-  reservation_type = "explicit"
-  subnet_id        = module.vpc_ran.private_subnets[5]
 }
 
 resource "aws_ec2_subnet_cidr_reservation" "core_controlplane_core_n2" {
