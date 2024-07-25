@@ -227,11 +227,7 @@ locals {
 resource "kubernetes_namespace" "flux_system" {
   metadata {
     name = "flux-system"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-  }  
+  } 
 }
 
 resource "kubernetes_secret" "ssh_keypair" {
@@ -262,10 +258,6 @@ resource "helm_release" "flux2" {
     kubernetes_namespace.flux_system,
     module.eks.module
     ]
-
-  lifecycle {
-    prevent_destroy = true
-  }
 
 }
 
@@ -299,10 +291,6 @@ resource "helm_release" "flux2_sync" {
   }
 
   depends_on = [helm_release.flux2]
-
-  lifecycle {
-    prevent_destroy = true
-  }
 
 }
 
@@ -342,10 +330,6 @@ resource "helm_release" "external_dns" {
   }  
 
   depends_on = [module.external_dns_irsa]
-
-  lifecycle {
-    prevent_destroy = true
-  }
 
 }
 
