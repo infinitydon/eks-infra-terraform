@@ -23,15 +23,15 @@ module "vpc_ran" {
 }
 
 resource "aws_ec2_tag" "ran_public_subnet_elb_tag" {
-  count       = length(module.vpc_ran.public_subnet_ids)
-  resource_id = module.vpc_ran.public_subnet_ids[count.index]
+  count       = length(module.vpc_ran.public_subnets)
+  resource_id = module.vpc_ran.public_subnets[count.index]
   key         = "kubernetes.io/role/elb"
   value       = "1"
 }
 
 resource "aws_ec2_tag" "ran_private_subnet_internal_elb_tag" {
-  count       = length(module.vpc_ran.private_subnet_ids)
-  resource_id = module.vpc_ran.private_subnet_ids[count.index]
+  count       = length(module.vpc_ran.private_subnets)
+  resource_id = module.vpc_ran.private_subnets[count.index]
   key         = "kubernetes.io/role/internal-elb"
   value       = "1"
 }
@@ -65,15 +65,15 @@ module "vpc_core_controlplane" {
 }
 
 resource "aws_ec2_tag" "core_ctrl_public_subnet_elb_tag" {
-  count       = length(module.vpc_core_controlplane.public_subnet_ids)
-  resource_id = module.vpc_core_controlplane.public_subnet_ids[count.index]
+  count       = length(module.vpc_core_controlplane.public_subnets)
+  resource_id = module.vpc_core_controlplane.public_subnets[count.index]
   key         = "kubernetes.io/role/elb"
   value       = "1"
 }
 
 resource "aws_ec2_tag" "core_ctrl_private_subnet_internal_elb_tag" {
-  count       = length(module.vpc_core_controlplane.private_subnet_ids)
-  resource_id = module.vpc_core_controlplane.private_subnet_ids[count.index]
+  count       = length(module.vpc_core_controlplane.private_subnets)
+  resource_id = module.vpc_core_controlplane.private_subnets[count.index]
   key         = "kubernetes.io/role/internal-elb"
   value       = "1"
 }
@@ -107,15 +107,15 @@ module "vpc_core_userplane" {
 }
 
 resource "aws_ec2_tag" "user_plane_public_subnet_elb_tag" {
-  count       = length(module.vpc_core_userplane.public_subnet_ids)
-  resource_id = module.vpc_core_userplane.public_subnet_ids[count.index]
+  count       = length(module.vpc_core_userplane.public_subnets)
+  resource_id = module.vpc_core_userplane.public_subnets[count.index]
   key         = "kubernetes.io/role/elb"
   value       = "1"
 }
 
 resource "aws_ec2_tag" "user_plane_private_subnet_internal_elb_tag" {
-  count       = length(module.vpc_core_userplane.private_subnet_ids)
-  resource_id = module.vpc_core_userplane.private_subnet_ids[count.index]
+  count       = length(module.vpc_core_userplane.private_subnets)
+  resource_id = module.vpc_core_userplane.private_subnets[count.index]
   key         = "kubernetes.io/role/internal-elb"
   value       = "1"
 }
