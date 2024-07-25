@@ -54,14 +54,6 @@ module "vpc_core_controlplane" {
   enable_dns_support   = true
   single_nat_gateway = true
 
-  public_subnet_tags = {
-    "kubernetes.io/role/elb" = 1
-  }
-
-  private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = 1
-  }  
-
 }
 
 resource "aws_ec2_tag" "core_ctrl_public_subnet_elb_tag" {
@@ -95,14 +87,6 @@ module "vpc_core_userplane" {
   enable_dns_hostnames = true
   enable_dns_support   = true
   single_nat_gateway = true
-
-  public_subnet_tags = {
-    "kubernetes.io/role/elb" = 1
-  }
-
-  private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = 1
-  }  
 
 }
 
