@@ -228,6 +228,10 @@ resource "kubernetes_namespace" "flux_system" {
   metadata {
     name = "flux-system"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }  
 }
 
 resource "kubernetes_secret" "ssh_keypair" {
@@ -342,7 +346,7 @@ resource "helm_release" "external_dns" {
   lifecycle {
     prevent_destroy = true
   }
-  
+
 }
 
 output "eks_kubeconfig" {
