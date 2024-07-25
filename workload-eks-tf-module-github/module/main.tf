@@ -121,7 +121,7 @@ module "eks" {
         sudo sysctl -p
         sleep 45
         ls /sys/class/net/ > /tmp/ethList;cat /tmp/ethList |while read line ; do sudo ifconfig $line up; done
-        grep eth /tmp/ethList |while read line ; do echo "ifconfig $line up" >> /etc/rc.d/rc.local; done
+        egrep "eth|ens" /tmp/ethList |while read line ; do echo "ifconfig $line up" >> /etc/rc.d/rc.local; done
         chmod +x /etc/rc.d/rc.local
         systemctl enable rc-local --now
         reboot
