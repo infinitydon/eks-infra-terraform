@@ -67,6 +67,7 @@ module "eks" {
   cluster_addons = {
     coredns = {
       most_recent = true
+      resolve_conflicts = "OVERWRITE"
     }
     kube-proxy = {
       most_recent = true
@@ -82,6 +83,7 @@ module "eks" {
     }
     aws-ebs-csi-driver = {
       service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
+      resolve_conflicts = "OVERWRITE"
     }
   }  
 
@@ -256,6 +258,11 @@ resource "helm_release" "flux2" {
     kubernetes_namespace.flux_system,
     module.eks.module
     ]
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
 }
 
 resource "helm_release" "flux2_sync" {
@@ -288,6 +295,11 @@ resource "helm_release" "flux2_sync" {
   }
 
   depends_on = [helm_release.flux2]
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
 }
 
 resource "helm_release" "external_dns" {
@@ -326,6 +338,11 @@ resource "helm_release" "external_dns" {
   }  
 
   depends_on = [module.external_dns_irsa]
+
+  lifecycle {
+    prevent_destroy = true
+  }
+  
 }
 
 output "eks_kubeconfig" {
