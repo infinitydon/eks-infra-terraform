@@ -166,6 +166,6 @@ resource "aws_lambda_invocation" "restart_asg_instances" {
   depends_on = [
     aws_lambda_function.LambdaAttach2ndENI,
     module.eks_blueprints_addons,
-    helm_release.flux2_sync  
+    kubernetes_manifest.flux_instance  
   ]  
 }
