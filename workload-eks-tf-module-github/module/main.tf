@@ -247,51 +247,40 @@ resource "kubernetes_secret" "ssh_keypair" {
   depends_on = [kubernetes_namespace.flux_system]
 }
 
-resource "helm_release" "flux2" {
-  name       = "flux2"
-  repository = "https://fluxcd-community.github.io/helm-charts"
-  chart      = "flux2"
-  version    = var.flux2_chart_version
+resource "helm_release" "flux_operator" {
+  depends_on = [kubernetes_namespace.flux_system]
+
+  name       = "flux-operator"
   namespace  = "flux-system"
-
-  depends_on = [
-    kubernetes_namespace.flux_system,
-    module.eks.module
-    ]
-
+  repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
+  chart      = "flux-operator"
 }
 
-resource "helm_release" "flux2_sync" {
-  repository = "https://fluxcd-community.github.io/helm-charts"
-  chart      = "flux2-sync"
-  version    = var.flux2_sync_chart_version
-
-  # Note: Do not change the name or namespace of gitops resource. The below mimics the behaviour of "flux bootstrap".
-  name      = "flux-system"
-  namespace = "flux-system"
-
-  set {
-    name  = "gitRepository.spec.url"
-    value = "https://github.com/${var.github_org}/${var.github_repository}.git"
+// Configure the Flux instance.
+resource "kubernetes_manifest" "flux_instance" {
+  manifest = {
+    apiVersion = "fluxcd.controlplane.io/v1"
+    kind       = "FluxInstance"
+    metadata = {
+      name      = "flux"
+      namespace = "flux-system"
+    }
+    spec = {
+      distribution = {
+        version  = "2.3.x"
+        registry = "ghcr.io/fluxcd"
+      }
+      sync = {
+        kind       = "GitRepository"
+        url        = "https://github.com/${var.github_org}/${var.github_repository}.git"
+        ref        = "refs/heads/main"
+        path       = "/"
+        pullSecret = "github-ssh-keypair"
+      }
+    }
   }
 
-  set {
-    name  = "gitRepository.spec.ref.branch"
-    value = "main"
-  }
-
-  set {
-    name  = "gitRepository.spec.secretRef.name"
-    value = kubernetes_secret.ssh_keypair.metadata[0].name
-  }
-
-  set {
-    name  = "gitRepository.spec.interval"
-    value = "1m"
-  }
-
-  depends_on = [helm_release.flux2]
-
+  depends_on = [helm_release.flux_operator]
 }
 
 resource "helm_release" "external_dns" {
