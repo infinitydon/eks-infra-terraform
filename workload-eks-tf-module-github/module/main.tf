@@ -65,10 +65,6 @@ module "eks" {
   cluster_encryption_config = {}
 
   cluster_addons = {
-    coredns = {
-      most_recent = true
-      resolve_conflicts = "OVERWRITE"
-    }
     kube-proxy = {
       most_recent = true
     }
@@ -80,10 +76,6 @@ module "eks" {
         AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS = "10.0.0.0/8"
       }
       })
-    }
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
-      resolve_conflicts = "OVERWRITE"
     }
   }  
 
@@ -131,6 +123,21 @@ module "eks" {
       }
    }
   }
+}
+
+resource "aws_eks_addon" "coredns" {
+  addon_name        = "coredns"
+  cluster_name      = var.eks_cluster_name
+  resolve_conflicts_on_create = "OVERWRITE"
+  depends_on        = [module.eks]
+}
+
+resource "aws_eks_addon" "aws-ebs-csi-driver" {
+  addon_name        = "aws-ebs-csi-driver"
+  cluster_name      = var.eks_cluster_name
+  resolve_conflicts_on_create = "OVERWRITE"
+  service_account_role_arn  = module.ebs_csi_driver_irsa.iam_role_arn
+  depends_on        = [module.eks]
 }
 
 resource "aws_security_group_rule" "allow_additional_cidrs" {
@@ -259,7 +266,6 @@ resource "helm_release" "flux_operator" {
 
 // Configure the Flux instance.
 resource "helm_release" "flux_instance" {
-  depends_on = [helm_release.flux_operator]
 
   name       = "flux"
   namespace  = "flux-system"
