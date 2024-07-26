@@ -254,6 +254,7 @@ resource "helm_release" "flux_operator" {
   namespace  = "flux-system"
   repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
   chart      = "flux-operator"
+  wait       = false
 }
 
 // Configure the Flux instance.
@@ -264,6 +265,7 @@ resource "helm_release" "flux_instance" {
   namespace  = "flux-system"
   repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
   chart      = "flux-instance"
+  wait       = false
 
   // Configure the Flux distribution.
   set {
