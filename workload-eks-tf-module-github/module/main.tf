@@ -257,30 +257,45 @@ resource "helm_release" "flux_operator" {
 }
 
 // Configure the Flux instance.
-resource "kubernetes_manifest" "flux_instance" {
-  manifest = {
-    apiVersion = "fluxcd.controlplane.io/v1"
-    kind       = "FluxInstance"
-    metadata = {
-      name      = "flux"
-      namespace = "flux-system"
-    }
-    spec = {
-      distribution = {
-        version  = "2.3.x"
-        registry = "ghcr.io/fluxcd"
-      }
-      sync = {
-        kind       = "GitRepository"
-        url        = "https://github.com/${var.github_org}/${var.github_repository}.git"
-        ref        = "refs/heads/main"
-        path       = "/"
-        pullSecret = "github-ssh-keypair"
-      }
-    }
+resource "helm_release" "flux_instance" {
+  depends_on = [helm_release.flux_operator]
+
+  name       = "flux"
+  namespace  = "flux-system"
+  repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
+  chart      = "flux-instance"
+
+  // Configure the Flux distribution.
+  set {
+    name  = "instance.distribution.version"
+    value = "2.x"
+  }
+  set {
+    name  = "instance.distribution.registry"
+    value = "ghcr.io/fluxcd"
   }
 
-  depends_on = [helm_release.flux_operator]
+  // Configure Flux Git sync.
+  set {
+    name  = "instance.sync.kind"
+    value = "GitRepository"
+  }
+  set {
+    name  = "instance.sync.url"
+    value = "https://github.com/${var.github_org}/${var.github_repository}.git"
+  }
+  set {
+    name  = "instance.sync.path"
+    value = "/"
+  }
+  set {
+    name  = "instance.sync.ref"
+    value = "refs/heads/main"
+  }
+  set {
+    name  = "instance.sync.pullSecret"
+    value = "github-ssh-keypair"
+  }
 }
 
 resource "helm_release" "external_dns" {
