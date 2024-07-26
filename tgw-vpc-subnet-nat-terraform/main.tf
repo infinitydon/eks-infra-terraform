@@ -8,7 +8,7 @@ module "vpc_ran" {
   name = "vpc-ran"
   cidr = var.vpc_ran_cidr
 
-  azs             = [var.ran_az1, var.ran_az2, var.ran_az1, var.ran_az1]
+  azs             = [var.ran_az1, var.ran_az2, var.ran_az1, var.ran_az1, var.ran_az1, var.ran_az1]
   private_subnets = [var.ran_eks_private_subnet_1, var.ran_eks_private_subnet_2, var.ran_f1_private_subnet, var.ran_e1_private_subnet, var.ran_n2_private_subnet, var.ran_n3_private_subnet]
   public_subnets  = [var.ran_public_subnet_1, var.ran_public_subnet_2]
 
@@ -88,6 +88,14 @@ module "vpc_core_userplane" {
   enable_dns_support   = true
   single_nat_gateway = true
 
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = 1
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = 1
+  }  
+
 }
 
 resource "aws_ec2_tag" "user_plane_public_subnet_elb_tag" {
@@ -121,6 +129,12 @@ resource "aws_ec2_subnet_cidr_reservation" "ran_n2" {
   cidr_block       = var.ran_n2_private_subnet_cidr_reservation
   reservation_type = "explicit"
   subnet_id        = module.vpc_ran.private_subnets[4]
+}
+
+resource "aws_ec2_subnet_cidr_reservation" "ran_n3" {
+  cidr_block       = var.ran_n3_private_subnet_cidr_reservation
+  reservation_type = "explicit"
+  subnet_id        = module.vpc_ran.private_subnets[5]
 }
 
 resource "aws_ec2_subnet_cidr_reservation" "core_controlplane_core_n2" {
