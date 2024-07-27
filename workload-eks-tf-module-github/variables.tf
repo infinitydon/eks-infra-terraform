@@ -62,3 +62,8 @@ variable "additional_cidrs_to_allow" {
   type        = list(string)
   default = [ "10.0.0.0/8" ]
 }
+
+variable "use_ubuntu_ami" {
+  description = "Use Ubuntu based AMI or not"
+  default = false
+}
