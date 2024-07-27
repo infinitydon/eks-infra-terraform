@@ -57,15 +57,15 @@ variable "git_credentials_secret" {
 }
 
 variable "node_instance_desired_capacity" {
-  default = "2"
+  default = "1"
 }
 
 variable "node_instance_max_capacity" {
-  default = "3"
+  default = "2"
 }
 
 variable "node_instance_min_capacity" {
-  default = "2"
+  default = "1"
 }
 
 variable "multus_subnets" {
