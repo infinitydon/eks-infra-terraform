@@ -125,20 +125,6 @@ module "eks" {
   }
 }
 
-resource "helm_release" "coredns" {
-  name       = "coredns"
-  repository = "https://coredns.github.io/helm"
-  chart      = "coredns"
-  namespace  = "kube-system"
-  
-  set {
-    name  = "service.clusterIP"
-    value = "10.100.0.10"
-  }
-
-  depends_on = [module.eks]
-}
-
 resource "helm_release" "aws_ebs_csi_driver" {
   name       = "aws-ebs-csi-driver"
   repository = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
