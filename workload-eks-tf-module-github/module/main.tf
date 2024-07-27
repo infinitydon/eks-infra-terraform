@@ -125,19 +125,37 @@ module "eks" {
   }
 }
 
-resource "aws_eks_addon" "coredns" {
-  addon_name        = "coredns"
-  cluster_name      = var.eks_cluster_name
-  resolve_conflicts_on_create = "OVERWRITE"
-  depends_on        = [module.eks]
+resource "helm_release" "coredns" {
+  name       = "coredns"
+  repository = "https://coredns.github.io/helm"
+  chart      = "coredns"
+  namespace  = "kube-system"
+  
+  set {
+    name  = "service.clusterIP"
+    value = "10.100.0.10"
+  }
+
+  depends_on = [module.eks]
 }
 
-resource "aws_eks_addon" "aws-ebs-csi-driver" {
-  addon_name        = "aws-ebs-csi-driver"
-  cluster_name      = var.eks_cluster_name
-  resolve_conflicts_on_create = "OVERWRITE"
-  service_account_role_arn  = module.ebs_csi_driver_irsa.iam_role_arn
-  depends_on        = [module.eks]
+resource "helm_release" "aws_ebs_csi_driver" {
+  name       = "aws-ebs-csi-driver"
+  repository = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
+  chart      = "aws-ebs-csi-driver"
+  namespace  = "kube-system"
+
+  set {
+    name  = "controller.serviceAccount.create"
+    value = "true"
+  }
+
+  set {
+    name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.ebs_csi_driver_irsa.iam_role_arn
+  }
+
+  depends_on = [module.eks]
 }
 
 resource "aws_security_group_rule" "allow_additional_cidrs" {
