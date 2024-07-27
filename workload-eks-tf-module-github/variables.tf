@@ -26,15 +26,15 @@ variable "aws_load_balancer_controller_enable" {
 }
 
 variable "node_instance_desired_capacity" {
-  default = "1"
+  default = "2"
 }
 
 variable "node_instance_max_capacity" {
-  default = "1"
+  default = "3"
 }
 
 variable "node_instance_min_capacity" {
-  default = "1"
+  default = "2"
 }
 
 variable "flux2_chart_version" {
