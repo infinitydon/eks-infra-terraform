@@ -112,8 +112,8 @@ module "eks" {
         echo "net.ipv4.conf.all.rp_filter = 0" | tee -a /etc/sysctl.conf
         sudo sysctl -p
         sleep 45
-        ls /sys/class/net/ > /tmp/ethList;cat /tmp/ethList |while read line ; do sudo ifconfig $line up; done
-        egrep "eth|ens" /tmp/ethList |while read line ; do echo "ifconfig $line up" >> /etc/rc.d/rc.local; done
+        ls /sys/class/net/ > /tmp/ethList;cat /tmp/ethList |while read line ; do sudo ip link set dev $line up; done
+        egrep "eth|ens" /tmp/ethList |while read line ; do echo "ip link set dev $line up" >> /etc/rc.d/rc.local; done
         chmod +x /etc/rc.d/rc.local
         systemctl enable rc-local --now
         reboot
@@ -265,7 +265,6 @@ resource "helm_release" "flux_operator" {
   namespace  = "flux-system"
   repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
   chart      = "flux-operator"
-  wait       = false
 }
 
 // Configure the Flux instance.
@@ -276,7 +275,6 @@ resource "helm_release" "flux_instance" {
   namespace  = "flux-system"
   repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
   chart      = "flux-instance"
-  wait       = false
 
   // Configure the Flux distribution.
   set {
