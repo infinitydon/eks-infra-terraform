@@ -108,14 +108,90 @@ module "eks" {
       instance_type         = var.node_instance_type
       enable_bootstrap_user_data = true
       post_bootstrap_user_data = <<-EOT
+        # Apply sysctl settings
         echo "net.ipv4.conf.default.rp_filter = 0" | tee -a /etc/sysctl.conf
         echo "net.ipv4.conf.all.rp_filter = 0" | tee -a /etc/sysctl.conf
-        sudo sysctl -p
+        sysctl -p
+
+        # Wait for network interfaces to be initialized
         sleep 45
-        ls /sys/class/net/ > /tmp/ethList;cat /tmp/ethList |while read line ; do sudo ip link set dev $line up; done
-        egrep "eth|ens" /tmp/ethList |while read line ; do echo "ip link set dev $line up" >> /etc/rc.d/rc.local; done
-        chmod +x /etc/rc.d/rc.local
+
+        # Bring up network interfaces
+        ls /sys/class/net/ > /tmp/ethList
+        cat /tmp/ethList | while read line; do
+            ip link set dev $line up
+        done
+
+        # Detect if the OS is Amazon Linux or Ubuntu
+        if [ -f /etc/system-release ]; then
+            os_name=$(cat /etc/system-release | awk '{print $1}')
+        else
+            os_name=$(lsb_release -si)
+        fi
+
+        # Prepare rc.local for both Amazon Linux and Ubuntu
+        if [[ "$os_name" == "Amazon" ]]; then
+            rc_local="/etc/rc.d/rc.local"
+            if [ ! -f "$rc_local" ]; then
+                cat << EOF > /etc/rc.d/rc.local
+        #!/bin/sh -e
+        # rc.local
+        # This script is executed at the end of each multiuser runlevel.
+        # Make sure that the script will "exit 0" on success or any other
+        # value on error.
+        # By default this script does nothing.
+
+        exit 0
+        EOF
+                chmod +x /etc/rc.d/rc.local
+            fi
+        else
+            rc_local="/etc/rc.local"
+            if [ ! -f "$rc_local" ]; then
+                cat << EOF > /etc/rc.local
+        #!/bin/sh -e
+        # rc.local
+        # This script is executed at the end of each multiuser runlevel.
+        # Make sure that the script will "exit 0" on success or any other
+        # value on error.
+        # By default this script does nothing.
+
+        exit 0
+        EOF
+                chmod +x /etc/rc.local
+
+                # Create systemd service file for Ubuntu
+                cat << EOF > /etc/systemd/system/rc-local.service
+        [Unit]
+        Description=/etc/rc.local Compatibility
+        ConditionPathExists=/etc/rc.local
+
+        [Service]
+        Type=forking
+        ExecStart=/etc/rc.local start
+        TimeoutSec=0
+        StandardOutput=tty
+        RemainAfterExit=yes
+        SysVStartPriority=99
+
+        [Install]
+        WantedBy=multi-user.target
+        EOF
+                systemctl daemon-reload
+                systemctl enable rc-local
+            fi
+        fi
+
+        # Add commands to rc.local
+        egrep "eth|ens" /tmp/ethList | while read line; do
+            echo "ip link set dev $line up" >> $rc_local
+        done
+
+        # Enable and start rc-local service
+        chmod +x $rc_local
         systemctl enable rc-local --now
+
+        # Reboot the system
         reboot
       EOT
       tags = {
