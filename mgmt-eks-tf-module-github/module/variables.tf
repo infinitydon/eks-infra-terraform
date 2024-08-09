@@ -13,22 +13,7 @@ variable "eks_cluster_name" {
 variable "eks_cluster_version" {
   description = "The version of the EKS cluster"
   type        = string
-  default     = "1.25"
-}
-
-variable "vpc_id" {
-  description = "The VPC ID to deploy resources in"
-  type        = string
-}
-
-variable "eks_subnets" {
-  description = "A list of subnet IDs to deploy resources in"
-  type        = list(string)
-}
-
-variable "ng_subnets" {
-  description = "A list of subnet IDs to deploy resources in"
-  type        = list(string)
+  default     = "1.29"
 }
 
 variable "node_instance_type" {
@@ -47,6 +32,10 @@ variable "github_repository" {
   type = string
 }
 
+variable "github_org" {
+  type = string
+}
+
 variable "github_token" {
   description = "Github PAT"
   type = string
@@ -62,14 +51,6 @@ variable "node_instance_max_capacity" {
 
 variable "node_instance_min_capacity" {
   default = "1"
-}
-
-variable "flux2_chart_version" {
-  default = "2.13.0"
-}
-
-variable "flux2_sync_chart_version" {
-  default = "1.8.2"
 }
 
 variable "flux_tf_controller_chart_version" {

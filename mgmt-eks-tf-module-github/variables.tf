@@ -14,21 +14,6 @@ variable "eks_cluster_version" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "The VPC ID to deploy resources in"
-  type        = string
-}
-
-variable "eks_subnets" {
-  description = "A list of subnet IDs to deploy resources in"
-  type        = list(string)
-}
-
-variable "ng_subnets" {
-  description = "A list of subnet IDs to deploy resources in"
-  type        = list(string)
-}
-
 variable "node_instance_type" {
   description = "The instance type for the EKS nodes"
   type        = string
@@ -41,6 +26,10 @@ variable "aws_load_balancer_controller_enable" {
 }
 
 variable "github_repository" {
+  type = string
+}
+
+variable "github_org" {
   type = string
 }
 
@@ -59,14 +48,6 @@ variable "node_instance_max_capacity" {
 
 variable "node_instance_min_capacity" {
   default = "1"
-}
-
-variable "flux2_chart_version" {
-  default = "2.13.0"
-}
-
-variable "flux2_sync_chart_version" {
-  default = "1.8.2"
 }
 
 variable "flux_tf_controller_chart_version" {
