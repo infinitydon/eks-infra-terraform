@@ -271,7 +271,7 @@ resource "time_sleep" "wait_eks_access_seconds" {
 }
 
 resource "kubernetes_service_account" "external-dns" {
-    depends_on = [resource.time_sleep.wait_eks_access_seconds]
+    depends_on = [time_sleep.wait_eks_access_seconds]
     count = var.create_external_dns ? 1 : 0
     metadata {
         name      = "external-dns"
@@ -318,7 +318,7 @@ resource "helm_release" "external_dns" {
   }  
 
   depends_on = [module.external_dns_irsa,
-                resource.time_sleep.wait_eks_access_seconds
+                time_sleep.wait_eks_access_seconds
                 ]
 
 }

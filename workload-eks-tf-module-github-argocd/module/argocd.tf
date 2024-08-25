@@ -11,6 +11,7 @@ locals {
 }
 
 module "eks_blueprints_addons" {
+  depends_on = [time_sleep.wait_eks_access_seconds]
   source = "aws-ia/eks-blueprints-addons/aws"
   version = "~> 1.0" #ensure to update gitops to the latest/desired version
 
@@ -60,7 +61,7 @@ module "eks_blueprints_addons" {
 }
 
 resource "kubernetes_secret" "mgmt_repo_ssh_key" {
-  depends_on = [module.eks_blueprints_addons, resource.time_sleep.wait_eks_access_seconds]
+  depends_on = [module.eks_blueprints_addons]
   metadata {
     name      = "mgmt-repo-ssh-key"
     namespace = "argocd"
