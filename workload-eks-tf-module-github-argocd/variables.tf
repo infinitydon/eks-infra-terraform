@@ -51,20 +51,6 @@ variable "additional_cidrs_to_allow" {
   default = [ "10.0.0.0/8" ]
 }
 
-variable "use_ubuntu_ami" {
-  description = "Use Ubuntu based AMI or not"
-  default = false
-}
-
-variable "create_external_dns" {
-  description = "Flag to control the creation of the external DNS chart"
-  type        = bool
-}
-
-variable "external_dns_domain_name" {
-  description = "Route53 private hosted zone domain name"
-}
-
 variable "argocd_version" {
   default = "7.4.5"
 }
