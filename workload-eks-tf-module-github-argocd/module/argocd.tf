@@ -6,10 +6,6 @@ data "aws_secretsmanager_secret_version" "github_credentials_version" {
   secret_id = data.aws_secretsmanager_secret.github_credentials.id
 }
 
-locals {
-  secret_data = jsondecode(data.aws_secretsmanager_secret_version.github_credentials_version.secret_string)
-}
-
 module "eks_blueprints_addons" {
   depends_on = [time_sleep.wait_eks_access_seconds]
   source = "aws-ia/eks-blueprints-addons/aws"

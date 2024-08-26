@@ -7,7 +7,7 @@ data "aws_ami" "eks_ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu-eks/k8s_${var.eks_cluster_version}/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu-eks/k8s_${local.transformed_eks_version}/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 
   filter {
@@ -54,7 +54,7 @@ module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "~> 20.11"
   cluster_name    = var.eks_cluster_name
-  cluster_version = var.eks_cluster_version
+  cluster_version = local.transformed_eks_version
   vpc_id          = var.vpc_id
   subnet_ids      = var.ng_subnets
   control_plane_subnet_ids = var.eks_subnets
