@@ -76,20 +76,7 @@ module "eks_blueprints_addons" {
     chart_version = var.argocd_version
     repository    = "https://argoproj.github.io/argo-helm"
     namespace     = "argocd"
-    set           = [
-      {
-        name  = "server.service.type"
-        value = "LoadBalancer"
-      },
-      {
-        name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
-        value = "nlb"
-      },
-      {
-        name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-scheme"
-        value = "internet-facing" # or "internal" based on your use case
-      }
-    ]
+    values        = [templatefile("${path.module}/argocd-values.yaml", {})]
   }
 
   tags = {
@@ -97,44 +84,66 @@ module "eks_blueprints_addons" {
   }
 }
 
-module "terranetes_controller_runner_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.29"
-
-  role_name_prefix = "${module.eks.cluster_name}-terranetes-executor"
-
-  role_policy_arns = {
-    RunnerPolicy = "arn:aws:iam::aws:policy/AdministratorAccess"
-  }
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["terraform-system:terraform-executor"]
-    }
-  }
-
-  depends_on = [module.eks]
+# Extract the OIDC provider URL from the EKS module
+locals {
+  oidc_provider_url = module.eks.oidc_provider
+  oidc_provider_id  = element(split("/", local.oidc_provider_url), length(split("/", local.oidc_provider_url)) - 1)
 }
 
-resource "helm_release" "terranetes_controller" {
-  depends_on = [time_sleep.wait_eks_access_seconds]
-  name       = "terranetes-controller"
-  repository = "https://terranetes-controller.appvia.io"
-  chart      = "terranetes-controller"
-  version    = var.terranetes_version
+# IAM Role
+resource "aws_iam_role" "terraform_runner" {
+  name = "${module.eks.cluster_name}-terraform-runner"
 
-  namespace = "terraform-system"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringLike = {
+            "${local.oidc_provider_url}:aud": "sts.amazonaws.com",
+            "${local.oidc_provider_url}:sub": "system:serviceaccount:tf-system:tf-*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# IAM Policy attachment
+resource "aws_iam_role_policy_attachment" "attach_runner_policy" {
+  role       = aws_iam_role.terraform_runner.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+resource "helm_release" "terraform_operator" {
+  depends_on = [time_sleep.wait_eks_access_seconds]
+  name       = "terraform-operator"
+  repository = "https://galleybytes.github.io/helm-charts"
+  chart      = "terraform-operator"
+  version    = var.terraform_operator_version
+
+  namespace = "tf-system"
 
   create_namespace = true
+}
 
+resource "helm_release" "argocd_default_app" {
+  depends_on = [module.eks_blueprints_addons]
+  name       = "nephio-app"
+  chart      = "oci://ghcr.io/infinitydon/nephio-app"
+  version    = var.argocd_default_app_version
+  namespace = "argocd"
   set {
-    name  = "rbac.executor.create"
-    value = true
+    name  = "githubOrg"
+    value = var.github_org
   }
-
   set {
-    name  = "rbac.executor.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.flux_tf_controller_runner_irsa.iam_role_arn
-  }
+    name  = "githubRepo"
+    value = var.github_repository
+  }    
 }

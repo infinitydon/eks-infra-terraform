@@ -82,7 +82,7 @@ resource "helm_release" "argocd_default_app" {
   name       = "nephio-app"
   chart      = "oci://ghcr.io/infinitydon/nephio-app"
   version    = var.argocd_default_app_version
-  namespace = "tf-system"
+  namespace = "argocd"
   set {
     name  = "githubOrg"
     value = var.github_org

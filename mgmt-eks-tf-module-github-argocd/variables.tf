@@ -54,6 +54,10 @@ variable "argocd_version" {
   default = "7.4.5"
 }
 
-variable "terranetes_version" {
-  default = "v0.7.16"
+variable "terraform_operator_version" {
+  default = "0.7.2"
+}
+
+variable "argocd_default_app_version" {
+  default = "0.1.0"
 }

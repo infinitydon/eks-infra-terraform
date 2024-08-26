@@ -24,7 +24,8 @@ module "eks_mgmt" {
   node_instance_max_capacity = var.node_instance_max_capacity
   node_instance_desired_capacity = var.node_instance_desired_capacity
   argocd_version = var.argocd_version
-  terranetes_version = var.terranetes_version
+  terraform_operator_version = var.terraform_operator_version
+  argocd_default_app_version = var.argocd_default_app_version
 }
 
 output "eks_kubeconfig" {
