@@ -107,10 +107,6 @@ variable "multus_security_group_id" {
   type        = string
 }
 
-variable "argocd_version" {
-  default = "7.4.5"
-}
-
 variable "create_external_dns" {
   description = "Flag to control the creation of the external DNS chart"
   type        = bool
