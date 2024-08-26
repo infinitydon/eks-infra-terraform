@@ -53,12 +53,13 @@ variable "additional_cidrs_to_allow" {
 
 variable "use_ubuntu_ami" {
   description = "Use Ubuntu based AMI or not"
-  default = false
+  type    = string
+  default = "false"
 }
 
 variable "create_external_dns" {
   description = "Flag to control the creation of the external DNS chart"
-  type        = bool
+  type        = string
 }
 
 variable "external_dns_domain_name" {

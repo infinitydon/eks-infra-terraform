@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_ami" "eks_ubuntu" {
-  count = var.use_ubuntu_ami ? 1 : 0
+  count = var.use_ubuntu_ami == "true" ? 1 : 0
   most_recent = true
   owners = ["099720109477"] # Canonical (Ubuntu)
 
@@ -99,7 +99,7 @@ module "eks" {
   self_managed_node_groups = {
    NG1= {      
       name         = "${var.eks_cluster_name}-nodegroup"
-      ami_id       = var.use_ubuntu_ami ? element(data.aws_ami.eks_ubuntu.*.id, 0) : null
+      ami_id       = var.use_ubuntu_ami == "true" ? element(data.aws_ami.eks_ubuntu.*.id, 0) : null
       min_size     = var.node_instance_min_capacity
       max_size     = var.node_instance_max_capacity
       desired_size = var.node_instance_desired_capacity
@@ -272,7 +272,7 @@ resource "time_sleep" "wait_eks_access_seconds" {
 
 resource "kubernetes_service_account" "external-dns" {
     depends_on = [time_sleep.wait_eks_access_seconds]
-    count = var.create_external_dns ? 1 : 0
+    count = var.create_external_dns  == "true" ? 1 : 0
     metadata {
         name      = "external-dns"
         namespace = "kube-system"
@@ -283,7 +283,7 @@ resource "kubernetes_service_account" "external-dns" {
 }
 
 resource "helm_release" "external_dns" {
-  count = var.create_external_dns ? 1 : 0
+  count = var.create_external_dns  == "true" ? 1 : 0
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
   version    = var.external_dns_chart_version
