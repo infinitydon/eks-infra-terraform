@@ -11,7 +11,7 @@ variable "eks_cluster_name" {
 
 variable "eks_cluster_version" {
   description = "The version of the EKS cluster"
-  type        = number
+  type        = string
 }
 
 variable "node_instance_type" {
