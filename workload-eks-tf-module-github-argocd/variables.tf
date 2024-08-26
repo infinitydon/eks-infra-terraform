@@ -64,3 +64,11 @@ variable "create_external_dns" {
 variable "external_dns_domain_name" {
   description = "Route53 private hosted zone domain name"
 }
+
+variable "argocd_version" {
+  default = "7.4.5"
+}
+
+variable "argocd_default_app_version" {
+  default = "0.1.0"
+}

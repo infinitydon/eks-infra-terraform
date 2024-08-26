@@ -41,7 +41,9 @@ module "workload_cluster" {
   external_dns_chart_version = var.external_dns_chart_version
   external_dns_domain_name  = local.workload_config.external_dns_domain_name
   additional_cidrs_to_allow = var.additional_cidrs_to_allow
-  use_ubuntu_ami            = local.workload_config.use_ubuntu_ami 
+  use_ubuntu_ami            = local.workload_config.use_ubuntu_ami
+  argocd_version = var.argocd_version
+  argocd_default_app_version = var.argocd_default_app_version
 }
 
 output "eks_kubeconfig" {

@@ -140,3 +140,11 @@ variable "use_ubuntu_ami" {
   description = "Use Ubuntu based AMI or not"
   default = false
 }
+
+variable "argocd_default_app_version" {
+  default = "0.1.0"
+}
+
+variable "argocd_version" {
+  default = "7.4.5"
+}

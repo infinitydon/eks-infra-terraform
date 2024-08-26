@@ -76,3 +76,19 @@ resource "kubernetes_secret" "mgmt_repo_ssh_key" {
     sshPrivateKey = local.secret_data.private_key
   }
 }
+
+resource "helm_release" "argocd_default_app" {
+  depends_on = [module.eks_blueprints_addons]
+  name       = "nephio-app"
+  chart      = "oci://ghcr.io/infinitydon/nephio-app"
+  version    = var.argocd_default_app_version
+  namespace = "tf-system"
+  set {
+    name  = "githubOrg"
+    value = var.github_org
+  }
+  set {
+    name  = "githubRepo"
+    value = var.github_repository
+  }    
+}
