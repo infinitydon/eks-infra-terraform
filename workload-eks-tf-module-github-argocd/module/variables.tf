@@ -134,6 +134,7 @@ variable "additional_cidrs_to_allow" {
 
 variable "use_ubuntu_ami" {
   description = "Use Ubuntu based AMI or not"
+  type        = bool
   default = false
 }
 
