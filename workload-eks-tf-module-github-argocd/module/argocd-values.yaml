@@ -15,11 +15,3 @@ configs:
         - ApplyReplacements
         clusters:
         - "*"
-      - apiGroups:
-        - ""
-        kinds:
-        - ConfigMap
-        clusters:
-        - "*"
-        names:
-        - kptfile.kpt.dev
