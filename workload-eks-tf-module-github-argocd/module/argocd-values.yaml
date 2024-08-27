@@ -1,0 +1,25 @@
+server:
+ service:
+   type: LoadBalancer
+   annotations:
+     service.beta.kubernetes.io/aws-load-balancer-type: nlb
+     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+
+configs:
+  cm:
+    timeout.reconciliation: 60s
+    resource.exclusions: |
+      - apiGroups:
+        - "*"
+        kinds:
+        - ApplyReplacements
+        clusters:
+        - "*"
+      - apiGroups:
+        - ""
+        kinds:
+        - ConfigMap
+        clusters:
+        - "*"
+        names:
+        - kptfile.kpt.dev

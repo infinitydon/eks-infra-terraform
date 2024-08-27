@@ -31,24 +31,7 @@ module "eks_blueprints_addons" {
     chart_version = var.argocd_version
     repository    = "https://argoproj.github.io/argo-helm"
     namespace     = "argocd"
-    set           = [
-      {
-        name  = "server.service.type"
-        value = "LoadBalancer"
-      },
-      {
-        name  = "configs.cm.timeout.reconciliation"
-        value = "60s"
-      },
-      {
-        name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
-        value = "nlb"
-      },
-      {
-        name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-scheme"
-        value = "internet-facing"
-      }
-    ]
+    values        = [templatefile("${path.module}/argocd-values.yaml", {})]
   }
 
   tags = {
