@@ -109,8 +109,8 @@ module "eks" {
       enable_bootstrap_user_data = true
       post_bootstrap_user_data = <<-EOT
         # Apply sysctl settings
-        echo "net.ipv4.conf.default.rp_filter = 0" | tee -a /etc/sysctl.conf
-        echo "net.ipv4.conf.all.rp_filter = 0" | tee -a /etc/sysctl.conf
+        echo "net.ipv4.conf.default.rp_filter=0" | tee -a /etc/sysctl.conf
+        echo "net.ipv4.conf.all.rp_filter=0" | tee -a /etc/sysctl.conf
         sysctl -p
 
         # Wait for network interfaces to be initialized

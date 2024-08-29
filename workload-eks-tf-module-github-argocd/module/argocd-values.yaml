@@ -13,5 +13,6 @@ configs:
         - "*"
         kinds:
         - ApplyReplacements
+        - WorkloadCluster
         clusters:
-        - "*"
+        - "*"   
