@@ -149,13 +149,13 @@ self_managed_node_groups = {
          # Ubuntu/Debian
          apt-get update
          apt-get install -y git make gcc linux-headers-$(uname -r)
-       elif [ -f /etc/redhat-release ]; then
-         # Amazon Linux/RHEL/CentOS
+       elif [ -f /etc/os-release ]; then
+         # Amazon Linux
          yum -y update
          yum -y install git make gcc kernel-devel-$(uname -r)
        fi
 
-       git clone --branch v0.8.10 https://github.com/free5gc/gtp5g.git
+       git clone --branch v0.9.3 https://github.com/free5gc/gtp5g.git
        cd gtp5g
        make clean && make
        make install
