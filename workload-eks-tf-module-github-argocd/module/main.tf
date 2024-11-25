@@ -172,6 +172,24 @@ resource "helm_release" "aws_ebs_csi_driver" {
   depends_on = [module.eks]
 }
 
+resource "kubectl_manifest" "gp2_csi_storage_class" {
+  depends_on = [helm_release.aws_ebs_csi_driver]
+
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp2-csi
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp2
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+YAML
+}
+
 resource "aws_security_group_rule" "allow_additional_cidrs" {
   count = length(var.additional_cidrs_to_allow) > 0 ? length(var.additional_cidrs_to_allow) : 0
 
