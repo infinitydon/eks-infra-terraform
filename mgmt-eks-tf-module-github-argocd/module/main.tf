@@ -105,6 +105,24 @@ module "ebs_csi_driver_irsa" {
   }
 }
 
+resource "kubectl_manifest" "gp2_csi_storage_class" {
+  depends_on = [module.eks]
+
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp2-csi
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp2
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+YAML
+}
+
 output "eks_kubeconfig" {
   value = <<-EOT
     aws eks update-kubeconfig --name ${var.eks_cluster_name} --region ${var.region}
