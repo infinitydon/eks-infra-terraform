@@ -96,61 +96,79 @@ module "eks" {
     }
   }
 
-  self_managed_node_groups = {
-   NG1= {      
-      name         = "${var.eks_cluster_name}-nodegroup"
-      ami_id       = var.use_ubuntu_ami ? element(data.aws_ami.eks_ubuntu.*.id, 0) : null
-      min_size     = var.node_instance_min_capacity
-      max_size     = var.node_instance_max_capacity
-      desired_size = var.node_instance_desired_capacity
-      vpc_security_group_ids = var.vpc_security_group_ids
-      launch_template_name   = "${var.eks_cluster_name}-managed-tmpl"
-      instance_type         = var.node_instance_type
-      enable_bootstrap_user_data = true
-      post_bootstrap_user_data = <<-EOT
-        # Apply sysctl settings
-        echo "net.ipv4.conf.default.rp_filter=0" | tee -a /etc/sysctl.conf
-        echo "net.ipv4.conf.all.rp_filter=0" | tee -a /etc/sysctl.conf
+self_managed_node_groups = {
+   NG1 = {
+     name         = "${var.eks_cluster_name}-nodegroup"
+     ami_id       = var.use_ubuntu_ami ? element(data.aws_ami.eks_ubuntu.*.id, 0) : null
+     min_size     = var.node_instance_min_capacity
+     max_size     = var.node_instance_max_capacity
+     desired_size = var.node_instance_desired_capacity
+     vpc_security_group_ids = var.vpc_security_group_ids
+     launch_template_name   = "${var.eks_cluster_name}-managed-tmpl"
+     instance_type         = var.node_instance_type
+     enable_bootstrap_user_data = true
+     post_bootstrap_user_data = <<-EOT
+       # Apply sysctl settings
+       echo "net.ipv4.conf.default.rp_filter=0" | tee -a /etc/sysctl.conf
+       echo "net.ipv4.conf.all.rp_filter=0" | tee -a /etc/sysctl.conf
 
-        # Create the network configuration script
-        cat << 'EOF' > /usr/local/bin/network-config.sh
-        #!/bin/bash
+       # Create the network configuration script
+       cat << 'EOF' > /usr/local/bin/network-config.sh
+       #!/bin/bash
 
-        ls /sys/class/net/ > /tmp/ethList
-        egrep "eth|ens" /tmp/ethList | while read line; do
-            ip link set dev $line up
-        done
-        EOF
+       ls /sys/class/net/ > /tmp/ethList
+       egrep "eth|ens" /tmp/ethList | while read line; do
+           ip link set dev $line up
+       done
+       EOF
 
-        chmod +x /usr/local/bin/network-config.sh
+       chmod +x /usr/local/bin/network-config.sh
 
-        # Create the systemd service file
-        cat << 'EOF' > /etc/systemd/system/network-config.service
-        [Unit]
-        Description=Network Configuration Script
-        After=network.target
+       # Create the systemd service file
+       cat << 'EOF' > /etc/systemd/system/network-config.service
+       [Unit]
+       Description=Network Configuration Script
+       After=network.target
 
-        [Service]
-        ExecStart=/usr/local/bin/network-config.sh
-        RemainAfterExit=yes
+       [Service]
+       ExecStart=/usr/local/bin/network-config.sh
+       RemainAfterExit=yes
 
-        [Install]
-        WantedBy=multi-user.target
-        EOF
+       [Install]
+       WantedBy=multi-user.target
+       EOF
 
-        # Reload systemd and enable the service
-        systemctl daemon-reload
-        systemctl enable network-config.service
-        systemctl start network-config.service       
+       # Reload systemd and enable the service
+       systemctl daemon-reload
+       systemctl enable network-config.service
+       systemctl start network-config.service
 
-        # Reboot the system
-        reboot
-      EOT
-      tags = {
-        Terraform   = "true"
-      }
+       %{if var.free5gcKernelEnable == "yes"}
+       # Detect OS and install Free5GC kernel module accordingly
+       if [ -f /etc/debian_version ]; then
+         # Ubuntu/Debian
+         apt-get update
+         apt-get install -y git make gcc linux-headers-$(uname -r)
+       elif [ -f /etc/redhat-release ]; then
+         # Amazon Linux/RHEL/CentOS
+         yum -y update
+         yum -y install git make gcc kernel-devel-$(uname -r)
+       fi
+
+       git clone --branch v0.8.10 https://github.com/free5gc/gtp5g.git
+       cd gtp5g
+       make clean && make
+       make install
+       %{endif}
+
+       # Reboot the system
+       reboot
+     EOT
+     tags = {
+       Terraform   = "true"
+     }
    }
-  }
+ }
 }
 
 resource "helm_release" "aws_ebs_csi_driver" {
