@@ -1,19 +1,19 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_ami" "eks_ubuntu" {
-  count = var.use_ubuntu_ami ? 1 : 0
-  most_recent = true
-  owners = ["099720109477"] # Canonical (Ubuntu)
+ count       = var.use_ubuntu_ami ? 1 : 0
+ most_recent = true
+ owners      = ["099720109477"]
 
-  filter {
-    name   = "name"
-    values = ["ubuntu-eks/k8s_${local.transformed_eks_version}/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
+ filter {
+   name   = "name"
+   values = ["ubuntu-eks/k8s_${local.transformed_eks_version}/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+ }
 
-  filter {
-        name = "virtualization-type"
-        values = ["hvm"]
-  }
+ filter {
+   name   = "virtualization-type"
+   values = ["hvm"]
+ }
 }
 
 
