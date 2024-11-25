@@ -147,6 +147,6 @@ variable "argocd_version" {
 
 variable "free5gcKernelEnable" {
   type    = string
-  default = "no"
+  default = "disable"
   description = "Enable Free5GC kernel module installation (yes/no)"
 }
