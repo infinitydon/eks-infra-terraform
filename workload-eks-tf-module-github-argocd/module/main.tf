@@ -143,7 +143,7 @@ self_managed_node_groups = {
        systemctl enable network-config.service
        systemctl start network-config.service
 
-       %{if var.free5gcKernelEnable == "enable"}
+       %{if var.free5gc_kernel == "enable"}
        # Detect OS and install Free5GC kernel module accordingly
        if [ -f /etc/debian_version ]; then
          # Ubuntu/Debian

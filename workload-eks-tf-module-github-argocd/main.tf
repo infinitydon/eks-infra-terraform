@@ -44,7 +44,7 @@ module "workload_cluster" {
   use_ubuntu_ami            = local.workload_config.use_ubuntu_ami
   argocd_version = var.argocd_version
   argocd_default_app_version = var.argocd_default_app_version
-  free5gcKernelEnable = var.free5gcKernelEnable
+  free5gc_kernel = var.free5gc_kernel
 }
 
 output "eks_kubeconfig" {

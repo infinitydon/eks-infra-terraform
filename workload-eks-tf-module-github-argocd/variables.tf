@@ -59,7 +59,7 @@ variable "argocd_default_app_version" {
   default = "0.1.0"
 }
 
-variable "free5gcKernelEnable" {
+variable "free5gc_kernel" {
   type    = string
   default = "disable"
   description = "Enable Free5GC kernel module installation (yes/no)"
