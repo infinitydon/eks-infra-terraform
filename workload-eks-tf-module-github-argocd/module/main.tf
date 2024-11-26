@@ -155,7 +155,7 @@ self_managed_node_groups = {
          yum -y install git make gcc kernel-devel-$(uname -r)
        fi
 
-       git clone --branch v0.9.3 https://github.com/free5gc/gtp5g.git
+       git clone --branch v0.8.6 https://github.com/free5gc/gtp5g.git
        cd gtp5g
        make clean && make
        make install
